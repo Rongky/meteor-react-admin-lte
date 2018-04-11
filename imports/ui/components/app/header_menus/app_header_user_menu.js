@@ -1,9 +1,20 @@
 /* eslint-disable import/no-unresolved */
 import { Meteor } from 'meteor/meteor';
-import React, { Component, PropTypes } from 'react';
-import { browserHistory } from 'react-router';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 export default class AppHeaderUserMenu extends Component {
+  constructor(props) {
+    super(props);
+    this.logout = this.logout.bind(this);
+  }
+
+  logout() {
+    Meteor.logout(() => {
+      this.props.history.push('/');
+    });
+  }
+
   userDisplayName() {
     const currentUser = this.props.user;
     let name = 'Alexander Pierce';
@@ -15,21 +26,14 @@ export default class AppHeaderUserMenu extends Component {
     return name;
   }
 
-  logout() {
-    Meteor.logout(() => {
-      browserHistory.push('/');
-    });
-  }
-
   render() {
     return (
       <li className="dropdown user user-menu">
         <a href="#" className="dropdown-toggle" data-toggle="dropdown">
           <img
-            alt="img user"
             src="/img/user2-160x160.jpg"
             className="user-image"
-            alt="User Image"
+            alt="User"
           />
           <span className="hidden-xs">{this.userDisplayName()}</span>
         </a>
@@ -38,10 +42,9 @@ export default class AppHeaderUserMenu extends Component {
 
           <li className="user-header">
             <img
-              alt="img user"
               src="/img/user2-160x160.jpg"
               className="img-circle"
-              alt="User Image"
+              alt="User"
             />
             <p>
               {this.userDisplayName()} - Admin <small>Admin since Jun. 2016</small>
@@ -79,4 +82,5 @@ export default class AppHeaderUserMenu extends Component {
 
 AppHeaderUserMenu.propTypes = {
   user: PropTypes.object,
+  history: PropTypes.object,
 };

@@ -1,57 +1,52 @@
 /* eslint-disable import/no-unresolved */
 import { Meteor } from 'meteor/meteor';
-import React, { Component, PropTypes } from 'react';
-import { createContainer } from 'meteor/react-meteor-data';
-import { browserHistory } from 'react-router';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Route } from 'react-router-dom';
+import { withTracker } from 'meteor/react-meteor-data';
 
 import SideBar from './sidebar/sidebar';
 import AppHeader from '../app/app_header';
 import AppFooter from '../app/app_footer';
-import StatisticView from './views/statistics/statistics';
+import Statistics from './views/statistics/statistics';
 
 class Dashboard extends Component {
-  componentDidMount() {
-    // i just want to show browser url in '/dashboard'.
-    // So, this component is repeated after index rendered <Dashboard />
-    browserHistory.push('/dashboard');
-  }
-
-  getContentView() {
-    return this.props.children && <StatisticView />;
+  componentWillMount() {
+    // do something
   }
 
   render() {
     const { currentUser } = this.props;
-
     const contentMinHeight = {
       minHeight: `${window.innerHeight - 101}px`,
     };
 
     return (
       <div className="wrapper">
-        <AppHeader user={currentUser} />
+        <AppHeader user={currentUser} history={this.props.history} />
         <SideBar user={this.props.currentUser} users={this.props.users} />
         
         <div className="content-wrapper" style={contentMinHeight} >
-            {this.getContentView()}
+          <Route exact path="/dashboard" name="statistics" component={Statistics} />
+          <Route path="/dashboard/statistics" name="statistics" component={Statistics} />
         </div>
 
         <AppFooter />
-        <div className="control-sidebar-bg"></div>
+        <div className="control-sidebar-bg" />
       </div>
     );
   }
 }
 
 Dashboard.propTypes = {
-  children: PropTypes.object,
   currentUser: PropTypes.object,
   users: PropTypes.arrayOf(PropTypes.object),
+  history: PropTypes.object,
 };
 
-export default createContainer(() => {
+export default withTracker(() => {
   /**
-   * Add subscription here
+   * Add subscriptions here
    */
   Meteor.subscribe('users');
 
@@ -59,4 +54,4 @@ export default createContainer(() => {
     currentUser: Meteor.user(),
     users: Meteor.users.find().fetch(),
   };
-}, Dashboard);
+})(Dashboard);
